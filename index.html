@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -59,17 +20,7 @@
                 <h1 class="text-2xl font-bold text-gray-800">Python Programming</h1>
             </a>
             <nav>
-                <a href="index.html" class="text-gray-600 hover:text-blue-600 px-3">Home</a>
-                <a href="chapters/objectives.html" class="text-gray-600 hover:text-blue-600 px-3">Objectives</a>
-                <a href="chapters/introduction.html" class="text-gray-600 hover:text-blue-600 px-3">Introduction</a>
-                <a href="chapters/installation.html" class="text-gray-600 hover:text-blue-600 px-3">Installation</a>
-                <a href="chapters/running.html" class="text-gray-600 hover:text-blue-600 px-3">Running</a>
-                <a href="chapters/variables.html" class="text-gray-600 hover:text-blue-600 px-3">Variables</a>
-                <a href="chapters/keywords.html" class="text-gray-600 hover:text-blue-600 px-3">Keywords</a>
-                <a href="chapters/functions.html" class="text-gray-600 hover:text-blue-600 px-3">Functions</a>
-                <a href="chapters/indentation.html" class="text-gray-600 hover:text-blue-600 px-3">Indentation</a>
-                <a href="chapters/datatypes.html" class="text-gray-600 hover:text-blue-600 px-3">Data Types</a>
-                <a href="chapters/exercises.html" class="text-gray-600 hover:text-blue-600 px-3">Exercises</a>
+                
             </nav>
         </div>
     </header>
@@ -84,6 +35,14 @@
             <p class="text-gray-600 mb-4">Python is a versatile, beginner-friendly language used in web development, data science, AI, automation, and more. This course covers fundamentals to advanced topics, with practical examples and interactive challenges.</p>
             <img src="figs/1.png" onerror="tryImageExtension(this, 'png')" alt="Python Applications" class="mt-4 w-full max-w-md mx-auto">
         </section>
+        <section class="bg-white p-8 rounded-lg shadow-lg mt-12 animate__animated animate__fadeInUp animate__delay-1s">
+            <h3 class="text-2xl font-semibold mb-4">About the Author</h3>
+            <p class="text-gray-600 mb-4"><strong>Dr. N Bharath Kumar</strong> is an Assistant Professor in the Department of Electrical and Electronics Engineering at Vignan's Foundation for Science Technology and Research. With a passion for education and technology, Dr. Kumar has developed this Python programming course to empower students and professionals with practical coding skills.</p>
+            <ul class="list-disc pl-6 text-gray-600">
+                <li>Email: <a href="mailto:nbk_eee@vignan.ac.in" class="text-blue-600 hover:underline">nbk_eee@vignan.ac.in</a></li>
+                <li>GitHub: <a href="https://github.com/bharat215eee" class="text-blue-600 hover:underline">github.com/bharat215eee</a></li>
+            </ul>
+        </section>
         <section class="mt-12">
             <h3 class="text-2xl font-semibold text-white mb-6 text-center">Course Chapters</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -91,7 +50,6 @@
                     <h4 class="text-xl font-semibold mb-2">Chapter 1: Introduction to Python Programming</h4>
                     <p class="text-gray-600">Learn Python basics, installation, variables, data types, and more through interactive content.</p>
                 </a>
-                <!-- Placeholder for additional chapters -->
                 <div class="bg-white p-6 rounded-lg shadow-lg animate__animated animate__fadeInUp animate__delay-1s">
                     <h4 class="text-xl font-semibold mb-2">Chapter 2: Coming Soon</h4>
                     <p class="text-gray-600">Stay tuned for advanced topics like functions, modules, and object-oriented programming.</p>
