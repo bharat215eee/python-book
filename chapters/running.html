@@ -1,0 +1,166 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Running Python - Chapter 1</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-900 to-purple-900 text-gray-800 animate__animated animate__fadeIn">
+    <header class="bg-white shadow fixed w-full z-10">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="index.html" class="flex items-center">
+                <svg class="w-12 h-12 mr-2" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 20C30 20 20 30 20 50s10 30 30 30 30-10 30-30S70 20 50 20zm0 50c-10 0-18-8-18-18s8-18 18-18 18 8 18 18-8 18-18 18z" fill="#3b82f6"/>
+                    <path d="M40 40h20v20H40z" fill="#ffffff"/>
+                    <text x="50" y="90" font-size="12" text-anchor="middle" fill="#ffffff">Python</text>
+                </svg>
+                <h1 class="text-2xl font-bold text-gray-800">Python Programming</h1>
+            </a>
+            <nav>
+                <a href="../index.html" class="text-gray-600 hover:text-blue-600 px-3">Home</a>
+                <a href="objectives.html" class="text-gray-600 hover:text-blue-600 px-3">Objectives</a>
+                <a href="introduction.html" class="text-gray-600 hover:text-blue-600 px-3">Introduction</a>
+                <a href="installation.html" class="text-gray-600 hover:text-blue-600 px-3">Installation</a>
+                <a href="running.html" class="text-gray-600 hover:text-blue-600 px-3">Running</a>
+                <a href="variables.html" class="text-gray-600 hover:text-blue-600 px-3">Variables</a>
+                <a href="keywords.html" class="text-gray-600 hover:text-blue-600 px-3">Keywords</a>
+                <a href="functions.html" class="text-gray-600 hover:text-blue-600 px-3">Functions</a>
+                <a href="indentation.html" class="text-gray-600 hover:text-blue-600 px-3">Indentation</a>
+                <a href="datatypes.html" class="text-gray-600 hover:text-blue-600 px-3">Data Types</a>
+                <a href="exercises.html" class="text-gray-600 hover:text-blue-600 px-3">Exercises</a>
+            </nav>
+        </div>
+    </header>
+    <main class="max-w-4xl mx-auto pt-24 pb-12 px-4">
+        <section class="bg-white p-8 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4">Running Python</h2>
+            <p>Python is an interpreted language with two modes:</p>
+            <h3 class="text-xl font-medium mb-2">Interactive Mode (REPL)</h3>
+            <p>Open a terminal, type <code>python3</code>, and press <kbd>Enter</kbd> to start the REPL. Execute commands like:</p>
+            <pre><code>print("Hello, World!")</code></pre>
+            <p>Exit with <code>exit()</code>.</p>
+            <img src="../figs/14.jpg" onerror="tryImageExtension(this, 'png')" alt="REPL Mode" class="mt-4 w-full max-w-md mx-auto">
+            <h3 class="text-xl font-medium mb-2 mt-4">Script Mode</h3>
+            <p>Create a <code>.py</code> file (e.g., <code>script.py</code>) and run it with <code>python script.py</code>.</p>
+            <img src="../figs/15.jpg" onerror="tryImageExtension(this, 'png')" alt="Running Script" class="mt-4 w-full max-w-md mx-auto">
+            <div class="quiz mt-6 p-4 bg-gray-50 rounded shadow">
+                <h3 class="text-xl font-medium mb-4">Quiz: Running Python</h3>
+                <form id="quiz-running" onsubmit="submitQuiz(event, 'running')">
+                    <p>1. How do you start the Python REPL? (Basic)</p>
+                    <label><input type="radio" name="q1" value="a" required> python</label><br>
+                    <label><input type="radio" name="q1" value="b"> python3</label><br>
+                    <label><input type="radio" name="q1" value="c"> py</label><br>
+                    <p class="mt-4">2. How do you exit the REPL? (Basic)</p>
+                    <input type="text" name="q2" class="border p-2 w-full" required><br>
+                    <p class="mt-4">3. What is the file extension for Python scripts? (Basic)</p>
+                    <label><input type="radio" name="q3" value="a" required> .txt</label><br>
+                    <label><input type="radio" name="q3" value="b"> .py</label><br>
+                    <label><input type="radio" name="q3" value="c"> .exe</label><br>
+                    <p class="mt-4">4. What command runs <code>script.py</code>? (Basic)</p>
+                    <input type="text" name="q4" class="border p-2 w-full" required><br>
+                    <p class="mt-4">5. Is Python compiled or interpreted? (Basic)</p>
+                    <label><input type="radio" name="q5" value="a" required> Compiled</label><br>
+                    <label><input type="radio" name="q5" value="b"> Interpreted</label><br>
+                    <p class="mt-4">6. What does <code>print("Hello")</code> output in the REPL? (Intermediate)</p>
+                    <input type="text" name="q6" class="border p-2 w-full" required><br>
+                    <p class="mt-4">7. If <code>python script.py</code> fails, what might be the issue? (Intermediate)</p>
+                    <label><input type="radio" name="q7" value="a" required> File not found</label><br>
+                    <label><input type="radio" name="q7" value="b"> Python not installed</label><br>
+                    <label><input type="radio" name="q7" value="c"> Both a and b</label><br>
+                    <p class="mt-4">8. Why use script mode over REPL for large programs? (Intermediate)</p>
+                    <input type="text" name="q8" class="border p-2 w-full" required><br>
+                    <p class="mt-4">9. What happens if you run <code>python3</code> with no arguments? (Intermediate)</p>
+                    <label><input type="radio" name="q9" value="a" required> Opens script</label><br>
+                    <label><input type="radio" name="q9" value="b"> Opens REPL</label><br>
+                    <label><input type="radio" name="q9" value="c"> Shows version</label><br>
+                    <p class="mt-4">10. If a script runs in REPL but fails in script mode, what should you check? (Advanced)</p>
+                    <input type="text" name="q10" class="border p-2 w-full" required><br>
+                    <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 mt-4">Submit Quiz</button>
+                </form>
+                <div id="quiz-running-output" class="mt-4"></div>
+            </div>
+        </section>
+    </main>
+    <script>
+        async function main() {
+            let pyodide = await loadPyodide();
+            console.log("Pyodide loaded");
+        }
+        main();
+
+        function tryImageExtension(img, newExt) {
+            let src = img.src;
+            if (src.endsWith('.jpg')) {
+                img.src = src.replace('.jpg', '.' + newExt);
+            } else if (src.endsWith('.png')) {
+                img.src = src.replace('.png', '.' + newExt);
+            }
+        }
+
+        function submitQuiz(event, section) {
+            event.preventDefault();
+            let form = event.target;
+            let formData = new FormData(form);
+            let answers = {};
+            for (let [key, value] of formData.entries()) {
+                answers[key] = value;
+            }
+            let submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
+            submissions.push({ section, type: 'quiz', answers, timestamp: new Date().toISOString() });
+            localStorage.setItem('submissions', JSON.stringify(submissions));
+            document.getElementById(`quiz-${section}-output`).innerText = `Quiz submitted for ${section}! Answers: ${JSON.stringify(answers, null, 2)}`;
+        }
+
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.body.classList.add('animate__animated', 'animate__fadeOut');
+                setTimeout(() => {
+                    window.location.href = link.href;
+                }, 500);
+            });
+        });
+    </script>

@@ -1,0 +1,121 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Programming Course</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gradient-to-br from-blue-900 to-purple-900 text-gray-800 animate__animated animate__fadeIn">
+    <header class="bg-white shadow fixed w-full z-10 animate__animated animate__fadeInDown">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="index.html" class="flex items-center">
+                <svg class="w-12 h-12 mr-2" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 20C30 20 20 30 20 50s10 30 30 30 30-10 30-30S70 20 50 20zm0 50c-10 0-18-8-18-18s8-18 18-18 18 8 18 18-8 18-18 18z" fill="#3b82f6"/>
+                    <path d="M40 40h20v20H40z" fill="#ffffff"/>
+                    <text x="50" y="90" font-size="12" text-anchor="middle" fill="#ffffff">Python</text>
+                </svg>
+                <h1 class="text-2xl font-bold text-gray-800">Python Programming</h1>
+            </a>
+            <nav>
+                <a href="index.html" class="text-gray-600 hover:text-blue-600 px-3">Home</a>
+                <a href="chapters/objectives.html" class="text-gray-600 hover:text-blue-600 px-3">Objectives</a>
+                <a href="chapters/introduction.html" class="text-gray-600 hover:text-blue-600 px-3">Introduction</a>
+                <a href="chapters/installation.html" class="text-gray-600 hover:text-blue-600 px-3">Installation</a>
+                <a href="chapters/running.html" class="text-gray-600 hover:text-blue-600 px-3">Running</a>
+                <a href="chapters/variables.html" class="text-gray-600 hover:text-blue-600 px-3">Variables</a>
+                <a href="chapters/keywords.html" class="text-gray-600 hover:text-blue-600 px-3">Keywords</a>
+                <a href="chapters/functions.html" class="text-gray-600 hover:text-blue-600 px-3">Functions</a>
+                <a href="chapters/indentation.html" class="text-gray-600 hover:text-blue-600 px-3">Indentation</a>
+                <a href="chapters/datatypes.html" class="text-gray-600 hover:text-blue-600 px-3">Data Types</a>
+                <a href="chapters/exercises.html" class="text-gray-600 hover:text-blue-600 px-3">Exercises</a>
+            </nav>
+        </div>
+    </header>
+    <main class="max-w-6xl mx-auto pt-24 pb-12 px-4">
+        <section class="text-center mb-12 animate__animated animate__fadeIn">
+            <h2 class="text-4xl font-bold text-white mb-4">Welcome to the Python Programming Course</h2>
+            <p class="text-lg text-gray-200 mb-6">Learn Python from the ground up with interactive lessons, quizzes, and hands-on exercises designed for beginners and beyond.</p>
+            <a href="chapters/index.html" class="bg-gray-800 text-white px-6 py-3 rounded hover:bg-gray-700 transition-colors">Start Chapter 1: Introduction to Python</a>
+        </section>
+        <section class="bg-white p-8 rounded-lg shadow-lg animate__animated animate__fadeInUp">
+            <h3 class="text-2xl font-semibold mb-4">Why Learn Python?</h3>
+            <p class="text-gray-600 mb-4">Python is a versatile, beginner-friendly language used in web development, data science, AI, automation, and more. This course covers fundamentals to advanced topics, with practical examples and interactive challenges.</p>
+            <img src="figs/1.png" onerror="tryImageExtension(this, 'png')" alt="Python Applications" class="mt-4 w-full max-w-md mx-auto">
+        </section>
+        <section class="mt-12">
+            <h3 class="text-2xl font-semibold text-white mb-6 text-center">Course Chapters</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <a href="chapters/index.html" class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow animate__animated animate__fadeInUp">
+                    <h4 class="text-xl font-semibold mb-2">Chapter 1: Introduction to Python Programming</h4>
+                    <p class="text-gray-600">Learn Python basics, installation, variables, data types, and more through interactive content.</p>
+                </a>
+                <!-- Placeholder for additional chapters -->
+                <div class="bg-white p-6 rounded-lg shadow-lg animate__animated animate__fadeInUp animate__delay-1s">
+                    <h4 class="text-xl font-semibold mb-2">Chapter 2: Coming Soon</h4>
+                    <p class="text-gray-600">Stay tuned for advanced topics like functions, modules, and object-oriented programming.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script>
+        function tryImageExtension(img, newExt) {
+            let src = img.src;
+            if (src.endsWith('.jpg')) {
+                img.src = src.replace('.jpg', '.' + newExt);
+            } else if (src.endsWith('.png')) {
+                img.src = src.replace('.png', '.' + newExt);
+            }
+        }
+
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.body.classList.add('animate__animated', 'animate__fadeOut');
+                setTimeout(() => {
+                    window.location.href = link.href;
+                }, 500);
+            });
+        });
+    </script>
