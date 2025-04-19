@@ -193,28 +193,26 @@
             q10: answers.q10
         };
         try {
-            const response = await fetch('https://script.google.com/macros/s/AKfycbzcoXAS2baQa_5TAdMStY7btBX1QPkmrid-gaLL3tpl-NLWWemgeJImuWwJuP976ogSUw/exec', {
+            const response = await fetch('https://script.google.com/macros/s/AKfycbyHxQSM7oIAsxnnX2WxIHOJIJgWL65t5Kvp4v_AFdI-r491iLTYaegnGatEWJXMuDdY3g/exec', {
                 method: 'POST',
+                mode: 'no-cors', // Handle opaque responses
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(submission)
             });
-            const result = await response.json();
-            if (result.result === 'success') {
-                // Maintain compatibility with existing submissions key
-                let submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
-                submissions.push({ section, type: 'quiz', answers, timestamp: result.timestamp });
-                localStorage.setItem('submissions', JSON.stringify(submissions));
-                output.innerText = `Quiz submitted by ${name} (Roll No: ${rollNumber}, Branch: ${branch}, Section: ${sectionField}) at ${new Date(result.timestamp).toLocaleString()}.`;
-                form.reset();
-                document.getElementById('student-name').value = '';
-                document.getElementById('roll-number').value = '';
-                document.getElementById('branch').value = '';
-                document.getElementById('section').value = '';
-            } else {
-                output.innerText = `Error: ${result.error}`;
-            }
+            // Since 'no-cors' returns an opaque response, we can't read the response body
+            // Assume success if no network error and check Google Sheet
+            let submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
+            submissions.push({ section, type: 'quiz', answers, timestamp: new Date().toISOString() });
+            localStorage.setItem('submissions', JSON.stringify(submissions));
+            output.innerText = `Quiz submitted by ${name} (Roll No: ${rollNumber}, Branch: ${branch}, Section: ${sectionField}) at ${new Date().toLocaleString()}.`;
+            form.reset();
+            document.getElementById('student-name').value = '';
+            document.getElementById('roll-number').value = '';
+            document.getElementById('branch').value = '';
+            document.getElementById('section').value = '';
         } catch (error) {
-            output.innerText = `Error: Failed to submit quiz. ${error.message}`;
+            console.error('Fetch error:', error);
+            output.innerText = `Error: Failed to submit quiz. ${error.message}. Please check your internet connection or Apps Script URL.`;
         }
     }
 
